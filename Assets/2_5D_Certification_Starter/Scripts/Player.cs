@@ -10,13 +10,21 @@ public class Player : MonoBehaviour
     private float _jumpHeight = 20f;
     [SerializeField]
     private float _gravity = 1f;
+    [SerializeField]
+    private bool _rollin = false;
+
+    private bool _canRoll = false;
     private Vector3 _direction, _velocity;
     private CharacterController controller;
     private Animator _anim;
     private bool _jumping = false;
     private bool _idleJump = false;
-    private bool _onLedge;
+    private bool _onLedge = false;
     private GameObject _ledgeClimbComplete;
+
+    private GameObject _finishedLocation;
+    private GameObject _startLocation;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +41,10 @@ public class Player : MonoBehaviour
         if(_onLedge == true)
         {
             if(Input.GetKeyDown(KeyCode.E))
-            _anim.SetTrigger("Climb");
+            {
+                _anim.SetTrigger("Climb");
+                _onLedge = false;
+            }
         }
     }
 
@@ -46,6 +57,7 @@ public class Player : MonoBehaviour
             _direction = new Vector3(0, 0, horizonalInput);
             _velocity = _direction * _speed;
 
+            //making the -1 turn +1 when facing Right
             if (horizonalInput != 0)
             {
                 Vector3 facing = transform.localEulerAngles;
@@ -59,6 +71,7 @@ public class Player : MonoBehaviour
                 _anim.SetBool("Jumping", _jumping);
             }
 
+            //Jumping and Idle Jumping
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 if (Mathf.Abs(_velocity.z) > 0.1)
@@ -71,6 +84,14 @@ public class Player : MonoBehaviour
                 {
                     StartCoroutine(StartIdleJump());
                 }
+            }
+            //if Rolling
+            if (Input.GetKeyDown(KeyCode.LeftShift) && !_jumping && _canRoll == true) 
+            {
+                controller.enabled = false;
+                _rollin = true;
+                _anim.SetTrigger("Rolling");
+                _canRoll = false;
             }
         }
 
@@ -88,6 +109,12 @@ public class Player : MonoBehaviour
         _anim.SetBool("Jumping", _idleJump);
     }
 
+    public void StartRolling(GameObject _pointA,GameObject _pointB)
+    {
+        _canRoll = true;
+        _startLocation = _pointA;
+        _finishedLocation = _pointB;
+    }
     public void LedgeGrab(GameObject _LedgeGrabPos,GameObject _finalPos)
     {
         controller.enabled = false;
@@ -104,5 +131,21 @@ public class Player : MonoBehaviour
         transform.position = _ledgeClimbComplete.transform.position;
         _anim.SetBool("LedgeGrab", false);
         controller.enabled = true;
+    }
+
+    public void RollingComplete()
+    {
+        if(transform.rotation.y ==0)
+        {
+            transform.position = _finishedLocation.transform.position;
+            _rollin = false;
+            controller.enabled = true;
+        }
+        else
+        {
+            transform.position = _startLocation.transform.position;
+            _rollin = false;
+            controller.enabled = true;
+        }
     }
 }
