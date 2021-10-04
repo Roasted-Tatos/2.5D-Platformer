@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     private float _gravity = 1f;
     [SerializeField]
     private bool _rollin = false;
+    [SerializeField]
+    private int _points;
 
     private bool _canRoll = false;
     private Vector3 _direction, _velocity;
@@ -20,8 +22,9 @@ public class Player : MonoBehaviour
     private bool _jumping = false;
     private bool _idleJump = false;
     private bool _onLedge = false;
-    private GameObject _ledgeClimbComplete;
 
+    private UIManager uimanager;
+    private GameObject _ledgeClimbComplete;
     private GameObject _finishedLocation;
     private GameObject _startLocation;
 
@@ -29,6 +32,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        uimanager = GameObject.Find("Canvas").GetComponent<UIManager>();
         controller = GetComponent<CharacterController>();
         _anim = GetComponentInChildren<Animator>();
     }
@@ -147,5 +151,12 @@ public class Player : MonoBehaviour
             _rollin = false;
             controller.enabled = true;
         }
+    }
+
+    public void Addpoints()
+    {
+        _points++;
+
+        uimanager.UpdatePointsDisplay(_points);
     }
 }
