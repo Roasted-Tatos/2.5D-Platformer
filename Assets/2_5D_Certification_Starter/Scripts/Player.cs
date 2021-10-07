@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     private bool _rollin = false;
     [SerializeField]
     private int _points;
+    [SerializeField]
+    private float _ladderSpeed = 2f;
 
     private bool _canRoll = false;
     private Vector3 _direction, _velocity;
@@ -22,11 +24,17 @@ public class Player : MonoBehaviour
     private bool _jumping = false;
     private bool _idleJump = false;
     private bool _onLedge = false;
+    private bool _onLadder = false;
+    [SerializeField]
+    private bool _climblingLadder = false;
+
 
     private UIManager uimanager;
     private GameObject _ledgeClimbComplete;
     private GameObject _finishedLocation;
     private GameObject _startLocation;
+    private GameObject _ladderTop;
+    private GameObject _ladderBottom;
 
 
     // Start is called before the first frame update
@@ -48,6 +56,38 @@ public class Player : MonoBehaviour
             {
                 _anim.SetTrigger("Climb");
                 _onLedge = false;
+            }
+        }
+        if(_onLadder == true)
+        {
+            if(_gravity > 0)
+            {
+                _gravity = 0;
+                _anim.SetBool("Ladder", _onLadder);
+                _climblingLadder = true;
+                transform.position = _ladderBottom.transform.position;
+                transform.rotation = Quaternion.LookRotation(Vector3.forward);
+            }
+            _velocity.y = Input.GetAxis("Vertical") * _ladderSpeed;
+            if(Mathf.Abs(_velocity.y)>0.1f)
+            {
+                if(_velocity.y >0)
+                {
+                    _anim.speed = 1f;
+                    _anim.SetFloat("Movement", 1f);
+                }
+                else
+                {
+                    _anim.speed = 1f;
+                    _anim.SetFloat("Movement", -1f);
+                }
+            }
+            else
+            {
+                if(_gravity ==0)
+                {
+                    _anim.speed = 0f;
+                }
             }
         }
     }
@@ -158,5 +198,35 @@ public class Player : MonoBehaviour
         _points++;
 
         uimanager.UpdatePointsDisplay(_points);
+    }
+
+    public void ClimbLadder(GameObject _targetA,GameObject _targetB)
+    {
+        _ladderTop = _targetB;
+        _ladderBottom = _targetA;
+        _anim.SetFloat("Speed", 0);
+        _onLadder = true;
+        Debug.Log("Ladder Reached");
+    }
+
+    public void OffLadder()
+    {
+        transform.position = _ladderTop.transform.position;
+        transform.rotation = Quaternion.LookRotation(Vector3.forward);
+        _gravity = 20f;
+        _climblingLadder = false;
+        controller.enabled = true;
+    }
+
+    public void ExitLadder()
+    {
+        _onLadder = false;
+        _anim.SetBool("Ladder", _onLadder);
+        _anim.speed = 1;
+        _velocity.y = 0;
+        if(_climblingLadder == true)
+        {
+            controller.enabled = false;
+        }
     }
 }
