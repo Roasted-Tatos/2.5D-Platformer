@@ -6,6 +6,8 @@ public class LedgeBehavior : MonoBehaviour
 {
     [SerializeField]
     private GameObject _LedgePoss, _standingPos;
+    [SerializeField]
+    private AudioClip _thudSound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -16,6 +18,7 @@ public class LedgeBehavior : MonoBehaviour
             if(player != null)
             {
                 player.LedgeGrab(_LedgePoss,_standingPos);
+                AudioSource.PlayClipAtPoint(_thudSound, Camera.main.transform.position);
             }
         }
     }

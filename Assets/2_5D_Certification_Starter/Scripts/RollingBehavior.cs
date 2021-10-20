@@ -6,7 +6,7 @@ public class RollingBehavior : MonoBehaviour
 {
     [SerializeField]
     private GameObject _pointA, _pointB;
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if(other.tag == "Player")
         {

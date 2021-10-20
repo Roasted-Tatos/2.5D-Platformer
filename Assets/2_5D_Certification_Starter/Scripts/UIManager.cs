@@ -10,6 +10,6 @@ public class UIManager : MonoBehaviour
 
     public void UpdatePointsDisplay(int points)
     {
-        _points.text = "Score: " + points.ToString();
+        _points.text = " " + points.ToString();
     }
 }

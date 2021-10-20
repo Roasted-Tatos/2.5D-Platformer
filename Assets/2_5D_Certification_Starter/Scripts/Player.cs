@@ -200,6 +200,11 @@ public class Player : MonoBehaviour
         uimanager.UpdatePointsDisplay(_points);
     }
 
+    public int totalPoints()
+    {
+        return _points;
+    }
+
     public void ClimbLadder(GameObject _targetA,GameObject _targetB)
     {
         _ladderTop = _targetB;
