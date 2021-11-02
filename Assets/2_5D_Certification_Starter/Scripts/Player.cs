@@ -17,16 +17,26 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _ladderSpeed = 2f;
 
+    [SerializeField]
     private bool _canRoll = false;
     private Vector3 _direction, _velocity;
     private CharacterController controller;
     private Animator _anim;
+    [SerializeField]
     private bool _jumping = false;
     private bool _idleJump = false;
     private bool _onLedge = false;
     private bool _onLadder = false;
     [SerializeField]
+    private bool _isMoving = false;
+    [SerializeField]
     private bool _climblingLadder = false;
+    [SerializeField]
+    private AudioSource _runningSound;
+    [SerializeField]
+    private AudioSource _climbingLadderSound;
+    [SerializeField]
+    private AudioSource _PlatformRunningSound;
 
 
     private UIManager uimanager;
@@ -35,6 +45,8 @@ public class Player : MonoBehaviour
     private GameObject _startLocation;
     private GameObject _ladderTop;
     private GameObject _ladderBottom;
+    [SerializeField]
+    private bool OnPlatform = false;
 
 
     // Start is called before the first frame update
@@ -42,6 +54,10 @@ public class Player : MonoBehaviour
     {
         uimanager = GameObject.Find("Canvas").GetComponent<UIManager>();
         controller = GetComponent<CharacterController>();
+        if(controller == null)
+        {
+            return;
+        }
         _anim = GetComponentInChildren<Animator>();
     }
 
@@ -57,21 +73,27 @@ public class Player : MonoBehaviour
                 _anim.SetTrigger("Climb");
                 _onLedge = false;
             }
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                _onLedge = false;
+                _anim.SetBool("LedgeGrab",false);
+                controller.enabled = true;
+            }
         }
         if(_onLadder == true)
         {
-            if(_gravity > 0)
+            if (_gravity > 0)
             {
                 _gravity = 0;
                 _anim.SetBool("Ladder", _onLadder);
                 _climblingLadder = true;
                 transform.position = _ladderBottom.transform.position;
-                transform.rotation = Quaternion.LookRotation(Vector3.forward);
+                //transform.rotation = Quaternion.LookRotation(Vector3.forward);
             }
             _velocity.y = Input.GetAxis("Vertical") * _ladderSpeed;
-            if(Mathf.Abs(_velocity.y)>0.1f)
+            if (Mathf.Abs(_velocity.y)>0.1f)
             {
-                if(_velocity.y >0)
+                if (_velocity.y >0)
                 {
                     _anim.speed = 1f;
                     _anim.SetFloat("Movement", 1f);
@@ -89,7 +111,24 @@ public class Player : MonoBehaviour
                     _anim.speed = 0f;
                 }
             }
+            if(Input.GetKeyDown(KeyCode.W))
+            {
+                _climbingLadderSound.Play();
+            }
+            if(Input.GetKeyUp(KeyCode.W))
+            {
+                _climbingLadderSound.Pause();
+            }
+            if(Input.GetKeyDown(KeyCode.S))
+            {
+                _climbingLadderSound.Play();
+            }
+            if(Input.GetKeyUp(KeyCode.S))
+            {
+                _climbingLadderSound.Pause();
+            }
         }
+
     }
 
     public void CalculateMovement()
@@ -100,6 +139,7 @@ public class Player : MonoBehaviour
             _anim.SetFloat("Speed", Mathf.Abs(horizonalInput));
             _direction = new Vector3(0, 0, horizonalInput);
             _velocity = _direction * _speed;
+
 
             //making the -1 turn +1 when facing Right
             if (horizonalInput != 0)
@@ -141,6 +181,24 @@ public class Player : MonoBehaviour
 
         _velocity.y -= _gravity * Time.deltaTime;
         controller.Move(_velocity * Time.deltaTime);
+        //Forcing the Sound Effects for Running
+        if (Input.GetKeyDown(KeyCode.D) && OnPlatform == false)
+        {
+            _runningSound.Play();
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            _runningSound.Pause();
+        }
+        if (Input.GetKeyDown(KeyCode.A) && OnPlatform == false)
+        {
+            _runningSound.Play();
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            _runningSound.Pause();
+        }
+
     }
     IEnumerator StartIdleJump()
     {
@@ -159,6 +217,11 @@ public class Player : MonoBehaviour
         _startLocation = _pointA;
         _finishedLocation = _pointB;
     }
+    public void StopRolling()
+    {
+        _canRoll = false;
+    }
+
     public void LedgeGrab(GameObject _LedgeGrabPos,GameObject _finalPos)
     {
         controller.enabled = false;
@@ -233,5 +296,31 @@ public class Player : MonoBehaviour
         {
             controller.enabled = false;
         }
+    }
+    public void RunningPlatform()
+    {
+        OnPlatform = true;
+
+        if(Input.GetKeyDown(KeyCode.A) && OnPlatform == true)
+        {
+            _PlatformRunningSound.Play();
+        }
+        if(Input.GetKeyUp(KeyCode.A))
+        {
+            _PlatformRunningSound.Pause();
+        }
+        if(Input.GetKeyDown(KeyCode.D) && OnPlatform == true)
+        {
+            _PlatformRunningSound.Play();
+        }
+        if(Input.GetKeyUp(KeyCode.D))
+        {
+            _PlatformRunningSound.Pause();
+        }
+    }
+    public void StopRunningPlatform()
+    {
+        OnPlatform = false;
+        _PlatformRunningSound.Pause();
     }
 }

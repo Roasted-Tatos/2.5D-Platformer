@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ledge_Grab_Checker
   - Fader
+  - music
+  - stageMusic
   layers:
   - Default
   - TransparentFX

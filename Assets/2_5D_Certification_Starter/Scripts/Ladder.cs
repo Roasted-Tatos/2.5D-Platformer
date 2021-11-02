@@ -6,8 +6,6 @@ public class Ladder : MonoBehaviour
 {
     [SerializeField]
     private GameObject _pointA, _pointB;
-    [SerializeField]
-    private AudioSource _climbingSound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -17,7 +15,6 @@ public class Ladder : MonoBehaviour
             if(player !=null)
             {
                 player.ClimbLadder(_pointA, _pointB);
-                _climbingSound.Play();
             }
         }
     }
@@ -30,7 +27,6 @@ public class Ladder : MonoBehaviour
             if (player !=null)
             {
                 player.ExitLadder();
-                _climbingSound.Pause();
             }
         }
     }

@@ -7,6 +7,8 @@ public class ButtonBehavior : MonoBehaviour
 {
     [SerializeField]
     private AudioSource _backgroundMusic;
+    [SerializeField]
+    private AudioClip _buttonSound;
 
     public float fadeTime = 1;
     public void FadeSound()
@@ -33,5 +35,22 @@ public class ButtonBehavior : MonoBehaviour
     public void PlayLevel()
     {
         SceneManager.LoadScene(1);
+        AudioSource.PlayClipAtPoint(_buttonSound, Camera.main.transform.position);
+    }
+    public void PlayCredits()
+    {
+        SceneManager.LoadScene(3);
+        AudioSource.PlayClipAtPoint(_buttonSound, Camera.main.transform.position);
+    }
+    public void MainMenuReturn()
+    {
+        AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(0);
+        float loadProgress = loadingOperation.progress;
+
+        if (loadingOperation.isDone)
+        {
+            Debug.Log("Loading is Finished");
+        }
+        AudioSource.PlayClipAtPoint(_buttonSound, Camera.main.transform.position);
     }
 }

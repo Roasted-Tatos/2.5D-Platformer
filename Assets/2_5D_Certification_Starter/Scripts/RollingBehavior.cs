@@ -6,7 +6,7 @@ public class RollingBehavior : MonoBehaviour
 {
     [SerializeField]
     private GameObject _pointA, _pointB;
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Player")
         {
@@ -16,6 +16,14 @@ public class RollingBehavior : MonoBehaviour
             {
                 player.StartRolling(_pointA,_pointB);
             }
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        Player player = other.GetComponent<Player>();
+        if(player !=null)
+        {
+            player.StopRolling();
         }
     }
 }
